@@ -6,6 +6,8 @@ from src.Reviews.GameClass import Game
 ## slownik zawierajacy klucz do obiektow typu Game
 gry = {}
 
+path_to_files=os.path.join("pliki_json")
+
 ## glowna funkcja reprezentujaca menu
 def menu():
     def menu_recenzji(game):
@@ -133,6 +135,8 @@ def delete_game():
             print("===================================")
             print("Pomyslnie usunieto!")
             print("===================================")
+            if os.path.exists(path_to_files):
+                os.remove(path_to_files+"\\"+result+".json")
         else:
             print("===================================\n"
                   "Nie znaleziono takiej gry do usuniecia")
@@ -175,8 +179,53 @@ def choose_game():
         return None
 
 def load_JSON_to_database():
-    path_to_files=os.path.join("pliki_json")
+    nazwa=producent=wydawca=recenzent=opis=""
+    gatunki=set()
+    ocena=difficulty=0
+    gra=None
+
     list_files=[f for f in os.listdir(path_to_files)]
     for files in list_files:
         with open(path_to_files+"\\"+files,"r") as f:
-            print(f.read(-1))
+            gatunki.clear()
+            result=f.read(-1).split('"')[1::2]
+            for i in range(len(result)):
+                try:
+                    nazwa = result[i+1] if result[i]=="Nazwa" else nazwa
+                    producent=result[i+1] if result[i]=="Producent" else producent
+                    wydawca=result[i+1] if result[i]=="Wydawca" else wydawca
+                    if result[i-1]=="Gatunki: ":
+                        k=1
+                        while result[i]=="Gatunek "+str(k):
+                            gatunki.add(result[i+1])
+                            i+=2
+                            k+=1
+                        else:
+                            gra=Game(nazwa, gatunki, wydawca, producent)
+                    if result[i]=="Recenzje":
+                        i+=1
+                        k=1
+                        while result[i]=="Recenzja "+str(k):
+                            i+=1
+                            recenzent= result[i+1] if result[i]=="Recenzent" else recenzent
+                            i+=2
+                            ocena=int(result[i+1]) if result[i]=="Ocena gry" else ocena
+                            i+=2
+                            difficulty=int(result[i+1]) if result[i]=="Ocena trudnosci" else difficulty
+                            i+=2
+                            opis=result[i+1] if result[i]=="Opis" else opis
+                            i+=2
+                            k+=1
+                            gra.recenzje.append(gra.Review(recenzent, ocena, difficulty, opis))
+                except IndexError:
+                    break
+
+            f.close()
+            gry[nazwa]=gra
+
+
+            """
+            for i in result:
+                print(str(k)+": "+i)
+                k+=1
+                """
