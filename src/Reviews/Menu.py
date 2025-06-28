@@ -1,9 +1,13 @@
 import os
+import sys
 from functools import reduce
+import matplotlib.pyplot as plt
+import numpy as np
 
-from src.Reviews.GameClass import Game
+import src.Reviews.CustomException as exc
+import src.Reviews.GameClass as gc
 
-## slownik zawierajacy klucz do obiektow typu Game
+## slownik zawierajacy klucz do obiektow typu gc.Game
 gry = {}
 
 path_to_files=os.path.join("pliki_json")
@@ -12,15 +16,14 @@ path_to_files=os.path.join("pliki_json")
 def menu():
     def menu_recenzji(game):
         try:
-            if isinstance(game, Game):
+            if isinstance(game, gc.Game):
                 while True:
                     print("1: Zmodyfikuj dane gry\n"
                           "2: dodaj recenzje: \n"
                           "3: usun dana recenzje\n"
                           "4: Przegladaj recencje\n"
                           "5: zmodyfikuj recenzje\n"
-                          "6: srednia z ocen recenzji\n"
-                          "7: Zapisz do pliku JSON\n"
+                          "6: Zapisz do pliku JSON\n"
                           "reszta: wyjscie z menu")
                     wybor1 = int(input("Wybor: "))
                     if wybor1 == 1:
@@ -30,38 +33,20 @@ def menu():
                     elif wybor1 == 3:
                         game.delete_review()
                     elif wybor1 == 4:
-                        game.drukuj_recenzje()
+                        game.print_reviews()
                     elif wybor1 == 5:
                         game.change_review()
                     elif wybor1==6:
-                        try:
-                            n=len(game.recenzje)
-                            if n<=1:
-                                raise TypeError
-                            else:
-                                avg=reduce(game.average_ranks,game.recenzje)
-                                print("Średnia ocen dla gry ",game.nazwa,": ",avg/n)
-                        except (TypeError,ZeroDivisionError):
-                            print("do obliczenia sredniej potrzebujemy co najmniej dwoch recenzji")
-                        finally:
-                            continue
-                    elif wybor1==7:
                         game.save_to_JSON()
                     else:
                         raise KeyboardInterrupt
             else:
-                print("Nie jest typem Gra")
                 return 0
-
         except KeyError:
-            print("===================================")
-            print("Podana gra nie znajduje sie w katalogu")
-            print("===================================")
+            print_with_separators("Podana gra nie znajduje sie w katalogu")
             return 0
         except KeyboardInterrupt:
-            print("===================================")
-            print("Wychodzenie z menu recenzje")
-            print("===================================")
+            print("Wyjscie do menu glownego")
             return 0
 
     print("===================================")
@@ -71,6 +56,7 @@ def menu():
                   "2: usun gre z katalogu\n"
                   "3: Przegladaj gry\n"
                   "4: przejdz do gry\n"
+                  "5: Wykresy\n"
                   "reszta: wyjscie z programu")
             wybor = int(input("Wybor: "))
             if wybor == 1:
@@ -86,17 +72,18 @@ def menu():
                     return 0
                 else:
                     continue
-
+            elif wybor==5:
+                chart()
             else:
-                raise KeyboardInterrupt
-    except KeyboardInterrupt:
-        print("W tym przypadku program sie zakonczyl. Milego dnia!")
-        return 0
+                raise exc.TerminateProgram
+    except exc.TerminateProgram:
+        print("W takim razie konczymy program. Milego dnia!")
+        sys.exit()
 
 
-## funkcje dla glownego menu
+"""funkcje dla glownego menu"""
 
-## dodawanie obiektu Game
+## dodawanie obiektu gc.Game
 def add_game():
     print("===================================")
     try:
@@ -112,70 +99,55 @@ def add_game():
             l = input("Gatunek " + str(len(gatunki)) + ": ")
         wydawca = input("Podaj wydawce: ")
         producent = input("Podaj producenta tej gry: ")
-        gry[nazwa] = Game(nazwa, gatunki, wydawca, producent)
+        gry[nazwa] = gc.Game(nazwa, gatunki, wydawca, producent)
     except KeyError:
-        print("===================================")
-        print("W katalogu znajduje sie juz taka gra!")
-        print("===================================")
+        print_with_separators("W katalogu znajduje sie juz taka gra!")
 
 ## usuwanie obiektu
 def delete_game():
     if len(gry) == 0:
-        print("===================================")
-        print("Katalog jest pusty")
-        print("===================================")
+        print_with_separators("Katalog jest pusty")
     else:
         print("==================================")
         for games in gry.values():
-            if isinstance(games, Game):
+            if isinstance(games, gc.Game):
                 print(games.nazwa)
         result = input("Podaj gre do wyboru: ")
         if result in gry.keys():
             del gry[result]
-            print("===================================")
-            print("Pomyslnie usunieto!")
-            print("===================================")
+            print_with_separators("Pomyslnie usunieto!")
             if os.path.exists(path_to_files):
                 os.remove(path_to_files+"\\"+result+".json")
         else:
-            print("===================================\n"
-                  "Nie znaleziono takiej gry do usuniecia")
-            print("===================================")
+            print_with_separators("Nie znaleziono takiej gry do usuniecia")
 
 ## wyswietlanie listy gier
 def game_list():
     if len(gry) == 0:
-        print("===================================")
-        print("Katalog jest pusty")
-        print("===================================")
+        print_with_separators("Katalog jest pusty")
     else:
         for i in gry.values():
-            if isinstance(i, Game):
+            if isinstance(i, gc.Game):
                 i.print_info()
 
 ## wybor obiektu gry do menu z recenzjami
 def choose_game():
-    result = ""
     try:
         if len(gry) == 0:
-            print("===================================")
-            print("Katalog jest pusty")
-            print("===================================")
+            print_with_separators("Katalog jest pusty")
             return None
         else:
             print("===================================")
             for games in gry.values():
-                if isinstance(games, Game):
+                if isinstance(games, gc.Game):
                     print(games.nazwa)
             result = gry[input("Podaj gre do wyboru: ")]
-            if isinstance(result, Game):
+            if isinstance(result, gc.Game):
                 return result
             else:
                 return None
     except KeyError:
-        print("===================================")
-        print("Nie znaleziono takiego klucza w katalogu")
-        print("===================================")
+        print_with_separators("Nie znaleziono takiego klucza w katalogu")
         return None
 
 def load_JSON_to_database():
@@ -201,7 +173,7 @@ def load_JSON_to_database():
                             i+=2
                             k+=1
                         else:
-                            gra=Game(nazwa, gatunki, wydawca, producent)
+                            gra=gc.Game(nazwa, gatunki, wydawca, producent)
                     if result[i]=="Recenzje":
                         i+=1
                         k=1
@@ -224,8 +196,66 @@ def load_JSON_to_database():
             gry[nazwa]=gra
 
 
-            """
-            for i in result:
-                print(str(k)+": "+i)
-                k+=1
-                """
+def rec_operation(games_list=None, i=0, op_num=1):
+    if games_list is None:
+        games_list = []
+    x=[]
+    result=0
+    
+    if i==len(games_list):
+        return []
+    else:
+        if isinstance(games_list[i],gc.Game):
+            n = len(games_list[i].recenzje)
+            if op_num==1:
+                x=[n]
+                return x+rec_operation(games_list,i+1,op_num)
+            elif op_num==2 or op_num==3:
+                try:
+                    result = reduce(sum_ranks, games_list[i].recenzje) / n if op_num ==2 else reduce(sum_diff, games_list[i].recenzje)/n
+                    x=[result]
+                except ZeroDivisionError:
+                    x=[0.0]
+                except TypeError:
+                    if n==0:
+                        x=[0.0]
+                    else:
+                        x=[float(games_list[i].get_review().ocena)] if op_num==2 else [float(games_list[i].get_review().difficulty)]
+                finally:
+                    return x+rec_operation(games_list, i + 1, op_num)
+
+def chart():
+    barwidth=0.25
+    suma_recenzji= rec_operation(list(gry.values()),op_num=1)
+    srednia_ocen=rec_operation(list(gry.values()),op_num=2)
+    srednia_difficulty=rec_operation(list(gry.values()),op_num=3)
+    r1=np.arange(len(suma_recenzji))
+    r2=[x + barwidth for x in r1]
+    r3=[x + barwidth for x in r2]
+
+    plt.bar(r1,suma_recenzji,color='r',width=barwidth,edgecolor='grey',label="ilosc recenzji")
+    plt.bar(r2,srednia_ocen,color='g',width=barwidth,edgecolor='grey',label="srednia wartosc ocen gry")
+    plt.bar(r3,srednia_difficulty,color='b',width=barwidth,edgecolor='grey',label="srednia wartosc ocen poziomu trudnosci")
+
+    plt.xlabel("Gra")
+    plt.ylabel("Statystyki")
+
+    plt.xticks([r + barwidth for r in range(len(suma_recenzji))],[n.nazwa for n in gry.values()])
+    plt.legend()
+    plt.show()
+    plt.savefig("wykres.png")
+
+
+
+def sum_ranks(x,y):
+    if isinstance(x,gc.Game.Review) and isinstance(y,gc.Game.Review):
+        return x.ocena+y.ocena
+
+def sum_diff(x,y):
+    if isinstance(x, gc.Game.Review) and isinstance(y, gc.Game.Review):
+        return x.difficulty + y.difficulty
+
+def print_with_separators(message=""):
+    print(f"===================================\n"
+          f"{message}\n"
+          f"===================================")

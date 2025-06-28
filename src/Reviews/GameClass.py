@@ -1,9 +1,7 @@
 import os
-
-from src.Reviews import CustomException as exc
-
+import src.Reviews.CustomException as exc
+import src.Reviews.Menu as mn
 import json
-
 
 
 ## klasa glowna Game z zagniezdzona klasa Review
@@ -38,9 +36,9 @@ class Game:
         try:
             recenzent=input("Podaj recenzenta: ")
             ocena=int(input("Podaj ocene od 0 do 10: "))
-            if 0<ocena>10: raise exc.ChartRangeError(ocena,min=0,max=10)
+            if 0<ocena>10: raise exc.ChartRangeError(ocena, min=0, max=10)
             difficulty=int(input("od 0 do 10 podaj wedlug ciebie jak ta gra jest trudna: "))
-            if 0 < difficulty >10: raise exc.ChartRangeError(difficulty,min=0,max=10)
+            if 0 < difficulty >10: raise exc.ChartRangeError(difficulty, min=0, max=10)
             opis=input("Dodaj opis: ")
 
         except exc.ChartRangeError as e:
@@ -49,31 +47,26 @@ class Game:
         finally:
             if not czy_blad:
                 self.recenzje.append(self.Review(recenzent, ocena, difficulty, opis))
-                print("===================================")
-                print("Pomyslnie dodano")
-                print("===================================")
+                mn.print_with_separators("Pomyslnie dodano")
 
     ## wyswietlanie listy recenzji
     def print_reviews(self):
         if len(self.recenzje)==0:
-            print("===================================")
-            print("Gra nie ma jeszcze zadnej recenzji")
-            print("===================================")
+            mn.print_with_separators("Gra nie ma jeszcze zadnej recenzji")
+
         else:
             for i in self.recenzje:
                 if isinstance(i,self.Review):
                     i.print_review()
     ## metoda zwracajaca wybrana recenzje
-    def get_review(self,i):
+    def get_review(self,i=0):
         try:
            result=self.recenzje[i]
            if isinstance(result,self.Review):
                return result
            return None
         except IndexError:
-            print("===================================")
-            print(f" twoj indeks {i} jest poza zasiegiem")
-            print("===================================")
+            mn.print_with_separators("Twoj indeks "+str(i)+" jest poza zasiegiem")
             return None
 
 
@@ -91,10 +84,10 @@ class Game:
                 res = input("Podaj nazwe gatunku, ktorego chcesz zmodyfikowac\n(dodatkowo 1: wszystko, 0:anuluj): ")
                 if res == "1":
                     self.gatunki=self.generate_genres()
-                elif res=="0":
-                    break
                 elif not res in self.gatunki:
                     print("Nie znaleziono gatunku w liscie")
+                    break
+                elif res=="0":
                     break
                 else:
                     self.gatunki.discard(res)
@@ -148,9 +141,7 @@ class Game:
     def delete_review(self):
         try:
             if len(self.recenzje)==0:
-                print("===================================")
-                print("Gra nie ma jeszcze zadnej recenzji")
-                print("===================================")
+                mn.print_with_separators("Gra nie ma jeszcze zadnej recenzji")
             else:
                 self.print_reviews()
                 index=int(input("Podaj indeks w liscie recenzji do usuniecia: "))
@@ -158,9 +149,7 @@ class Game:
                     raise exc.ChartRangeError(index,min=0,max=len(self.recenzje)-1)
                 else:
                     self.recenzje.pop(index)
-                    print("===================================")
-                    print("Pomyslnie usunieto")
-                    print("===================================")
+                    mn.print_with_separators("Pomyslnie usunieto")
         except exc.ChartRangeError as e:
             print(e)
 
@@ -168,9 +157,7 @@ class Game:
     def change_review(self):
         try:
             if len(self.recenzje)==0:
-                print("===================================")
-                print("Gra nie ma jeszcze zadnej recenzji")
-                print("===================================")
+                mn.print_with_separators("Gra nie ma jeszcze zadnej recenzji")
             else:
                 self.print_reviews()
                 index=int(input("Podaj indeks w liscie recenzji do modyfikacji: "))
@@ -200,12 +187,7 @@ class Game:
         with open(os.path.join("pliki_json",self.nazwa+".json"),"w") as file:
             file.write(json.dumps(dictionary,indent=4))
             file.close()
-            print("===================================")
-            print("Gra z recenzjami pomyslnie zapisano do pliku: "+self.nazwa+".json")
-            print("===================================")
-    def average_ranks(self,x,y):
-            if isinstance(x,self.Review) and isinstance(y,self.Review):
-                return x.ocena+y.ocena
+            mn.print_with_separators("Gra z recenzjami pomyslnie zapisano do pliku: "+self.nazwa+".json")
 
 
 
@@ -280,5 +262,3 @@ class Game:
                         "Ocena trudnosci": str(self.difficulty),
                         "Opis":self.opis}
             return dictionary
-
-
