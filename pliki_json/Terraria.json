@@ -1,0 +1,24 @@
+{
+    "Nazwa": "Terraria",
+    "Producent": "Re-logic",
+    "Wydawca": "Re-logic",
+    "Gatunki: ": {
+        "Gatunek 1": "Rpg",
+        "Gatunek 2": "Przygodowe",
+        "Gatunek 3": "Sandbox"
+    },
+    "Recenzje": {
+        "Recenzja 1": {
+            "Recenzent": "Jakub Gebski",
+            "Ocena gry": "10",
+            "Ocena trudnosci": "7",
+            "Opis": "Bardzo dobra gra, choc trudna"
+        },
+        "Recenzja 2": {
+            "Recenzent": "Damian Gaweda",
+            "Ocena gry": "5",
+            "Ocena trudnosci": "4",
+            "Opis": "cos"
+        }
+    }
+}

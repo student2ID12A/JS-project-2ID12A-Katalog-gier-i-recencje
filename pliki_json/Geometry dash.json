@@ -1,0 +1,24 @@
+{
+    "Nazwa": "Geometry Dash",
+    "Producent": "Robtop",
+    "Wydawca": "Robtop",
+    "Gatunki: ": {
+        "Gatunek 1": "Platform Game",
+        "Gatunek 2": "Rythm Based Game",
+        "Gatunek 3": "Psychological Horror"
+    },
+    "Recenzje": {
+        "Recenzja 1": {
+            "Recenzent": "Jakub Gebski",
+            "Ocena gry": "10",
+            "Ocena trudnosci": "10",
+            "Opis": "Bardzo chcialbym podzielic sie moja opinia jak ta gra jest bardzo, ale to bardzo trudna dla poczatkujacych"
+        },
+        "Recenzja 2": {
+            "Recenzent": "Hater Geometry dash",
+            "Ocena gry": "0",
+            "Ocena trudnosci": "10",
+            "Opis": "ASDSDFDDSJFHFDDRSHGBHFDNWRGHNDFGHDBJDHGF"
+        }
+    }
+}

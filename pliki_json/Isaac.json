@@ -1,0 +1,17 @@
+{
+    "Nazwa": "Isaac",
+    "Producent": "Mc-millen",
+    "Wydawca": "Mc-millen",
+    "Gatunki: ": {
+        "Gatunek 1": "Rougelike",
+        "Gatunek 2": "shooter"
+    },
+    "Recenzje": {
+        "Recenzja 1": {
+            "Recenzent": "Eleven",
+            "Ocena gry": "8",
+            "Ocena trudnosci": "6",
+            "Opis": "Ciekawa gra"
+        }
+    }
+}
