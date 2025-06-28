@@ -9,13 +9,16 @@ import json
 ## klasa glowna Game z zagniezdzona klasa Review
 class Game:
     ## konstruktor
-    def __init__(self,nazwa,gatunki,wydawca,producent):
+    def __init__(self, nazwa="", gatunki=None, wydawca="", producent=""):
+        if gatunki is None:
+            gatunki = []
         self.genre_dict = {}
-        self.nazwa=nazwa
+        self.nazwa=nazwa.title()
         self.gatunki=set(gatunki)
-        self.wydawca=wydawca
-        self.producent=producent
+        self.wydawca=wydawca.capitalize()
+        self.producent=producent.capitalize()
         self.recenzje=[]
+
     ## wyswietlanie informacji o obiekcie
     def print_info(self):
         print("----------------------------------------------------")
@@ -51,7 +54,7 @@ class Game:
                 print("===================================")
 
     ## wyswietlanie listy recenzji
-    def drukuj_recenzje(self):
+    def print_reviews(self):
         if len(self.recenzje)==0:
             print("===================================")
             print("Gra nie ma jeszcze zadnej recenzji")
@@ -96,13 +99,13 @@ class Game:
                 else:
                     self.gatunki.discard(res)
                     inp=input("Zamien "+res+" na: ")
-                    self.gatunki.add(inp)
+                    self.gatunki.add(inp.title())
 
     def set_producer(self,new_producer):
-        self.producent=new_producer
+        self.producent=new_producer.capitalize()
 
     def set_publisher(self,new_publisher):
-        self.wydawca=new_publisher
+        self.wydawca=new_publisher.capitalize()
 
     def generate_genres(self):
         gatunki = set()
@@ -149,7 +152,7 @@ class Game:
                 print("Gra nie ma jeszcze zadnej recenzji")
                 print("===================================")
             else:
-                self.drukuj_recenzje()
+                self.print_reviews()
                 index=int(input("Podaj indeks w liscie recenzji do usuniecia: "))
                 if 0<index>=len(self.recenzje):
                     raise exc.ChartRangeError(index,min=0,max=len(self.recenzje)-1)
@@ -169,7 +172,7 @@ class Game:
                 print("Gra nie ma jeszcze zadnej recenzji")
                 print("===================================")
             else:
-                self.drukuj_recenzje()
+                self.print_reviews()
                 index=int(input("Podaj indeks w liscie recenzji do modyfikacji: "))
                 if 0<index>=len(self.recenzje):
                     raise exc.ChartRangeError(index,min=0,max=len(self.recenzje)-1)
@@ -192,14 +195,13 @@ class Game:
         return review_dict
 
     def save_to_JSON(self):
-        list_files = [f for f in os.listdir(os.path.join("pliki_json"))]
-        dictionary= {"Nazwa gry": self.nazwa,"Producent":self.producent,"Wydawca":self.wydawca,"Gatunki: ":self.genre_to_dict(),"Recenzje":self.reviews_to_dict()}
+        dictionary= {"Nazwa": self.nazwa,"Producent":self.producent,"Wydawca":self.wydawca,"Gatunki: ":self.genre_to_dict(),"Recenzje":self.reviews_to_dict()}
 
         with open(os.path.join("pliki_json",self.nazwa+".json"),"w") as file:
             file.write(json.dumps(dictionary,indent=4))
             file.close()
             print("===================================")
-            print("Gra z recenzjami pomyslnie zapisano do pliku: "+str(len(list_files)+1)+".json")
+            print("Gra z recenzjami pomyslnie zapisano do pliku: "+self.nazwa+".json")
             print("===================================")
     def average_ranks(self,x,y):
             if isinstance(x,self.Review) and isinstance(y,self.Review):
@@ -209,8 +211,8 @@ class Game:
 
     ## zagniezdzona klasa review
     class Review:
-        def __init__(self, recenzent,ocena,difficulty,opis):
-            self.recenzent = recenzent
+        def __init__(self, recenzent="",ocena=0,difficulty=0,opis=""):
+            self.recenzent = recenzent.title()
             self.ocena=ocena
             self.difficulty=difficulty
             self.opis=opis
@@ -225,7 +227,7 @@ class Game:
             print("------------------------------------")
 
         def change_recenzent(self,nowy_recenzent):
-            self.recenzent=nowy_recenzent
+            self.recenzent=nowy_recenzent.title()
         def change_ocena(self,new_ocena):
             try:
                 if 0<new_ocena>10:
@@ -273,9 +275,9 @@ class Game:
                 print(e)
 
         def to_dict(self):
-            dictionary={"Rezenzent":self.recenzent,
-                        "Ocena gry": self.ocena,
-                        "Ocena trudnosci":self.difficulty,
+            dictionary={"Recenzent":self.recenzent,
+                        "Ocena gry": str(self.ocena),
+                        "Ocena trudnosci": str(self.difficulty),
                         "Opis":self.opis}
             return dictionary
 
