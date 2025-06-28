@@ -1,5 +1,7 @@
 Temat projektu: Katalog gier i recenzji
 
+Założenia: Katalog gier pozwalający na przeglądanie gier, modyfikację, dodawanie/usuwanie, zapisywanie oraz odczytywanie z plików JSON i to samo z recenzjami
+
 Autorzy:
 - Jakub Gębski
 - Damian Gawęda
@@ -23,3 +25,16 @@ Dodano:
 
 - Funkcje odczytującą pliki JSON z odpowiednim formatem i aplikuje do katalogu gier podczas działania programu
 - Wprowadzono parę funkcji formatujących ciąg znaków dla paru parametrów dla obiektów w celu uzyskania formatowania
+
+  
+==========================================
+WERSJA 1.2.1
+==========================================
+
+Dodano:
+- Klasę dziedziczącą po wyjątku obsługujący terminację z programu
+- Funkcję tworzącą wykres po wartościach numerycznych dla gier
+
+Poprawiono:
+- Niektóre funkcje dla klasy Game
+- ogólnie skrypt
